@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tutoring Help</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // Function to calculate the total price based on subject selections
+    function calculateTotal() {
+      var total = 0;
+      $("input[name='subjects']:checked").each(function() {
+        total += parseInt($(this).val());
+      });
+      $("#total-price").text("$" + total);
+    }
+  </script>
+</head>
+<body>
+  <h1>Tutoring Help</h1>
+  <form id="tutoring-form">
+    <label for="student-name">1) Please enter student name:</label>
+    <input type="text" id="student-name" name="student-name" required>
+    <br>
+    <label for="birth-date">2) Please enter birth date:</label>
+    <input type="date" id="birth-date" name="birth-date" required>
+    <br>
+    <label for="level">3) Please enter level of tutoring required:</label>
+    <select id="level" name="level" required>
+      <option value="elementary">Elementary</option>
+      <option value="middle-school">Middle School</option>
+      <option value="high-school">High School</option>
+      <option value="college">College</option>
+    </select>
+    <br>
+    <label for="subjects">4) Please select subjects:</label>
+    <br>
+    <input type="checkbox" id="math" name="subjects" value="20">
+    <label for="math">Math - $20/hour</label>
+    <br>
+    <input type="checkbox" id="english" name="subjects" value="20">
+    <label for="english">English - $20/hour</label>
+    <br>
+    <input type="checkbox" id="business" name="subjects" value="15">
+    <label for="business">Business - $15/hour</label>
+    <br>
+    <input type="checkbox" id="accounting" name="subjects" value="15">
+    <label for="accounting">Accounting - $15/hour</label>
+    <br>
+    <input type="checkbox" id="economics" name="subjects" value="15">
+    <label for="economics">Economics - $15/hour</label>
+    <br><br>
+    <button type="button" onclick="calculateTotal()">Calculate Total</button>
+    <p id="total-price">Total Price: $0</p>
+    <br>
+    <label for="email">5) Please enter your email:</label>
+    <input type="email" id="email" name="email" required>
+    <br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    $(document).ready(function() {
+      // Handle form submission
+      $("#tutoring-form").submit(function(e) {
+        e.preventDefault();
+
+        // Retrieve form data
+        var studentName = $("#student-name").val();
+        var birthDate = $("#birth-date").val();
+        var level = $("#level").val();
+        var selectedSubjects = $("input[name='subjects']:checked").map(function() {
+          return $(this).attr("id");
+        }).get();
+        var email = $("#email").val();
+
+        // Construct the receipt email body
+        var receipt = "Thank you for your tutoring order!\n\n";
+        receipt += "Student Name: " + studentName + "\n";
+        receipt += "Birth Date: " + birthDate + "\n";
+        receipt += "Level of Tutoring: " + level + "\n";
+        receipt += "Selected Subjects:\n";
+        selectedSubjects.forEach(function(subject) {
+          receipt += "- " + subject.charAt(0).toUpperCase() + subject.slice(1) + "\n";
+        });
+        receipt += "Total Price: $" + $("#total-price").text().substring(1) + "\n\n";
+        receipt += "We will contact you shortly to schedule the tutoring sessions.";
+
+        // Send the receipt email
+        Email.send({
+          Host: "smtp.gmail.com",
+          Username: "your-email@gmail.com",
+          Password: "your-email-password",
+          To: email,
+          From: "your-email@gmail.com",
+          Subject: "Tutoring Receipt",
+          Body: receipt
+        }).then(function(message) {
+          // Display success message
+          alert("Receipt sent successfully!\nPlease check your email.");
+
+          // Reset the form
+          $("#tutoring-form")[0].reset();
+          $("#total-price").text("Total Price: $0");
+        }, function(error) {
+          // Display error message
+          alert("Failed to send receipt.\nPlease try again later.");
+        });
+      });
+    });
+  </script>
+</body>
+</html>
